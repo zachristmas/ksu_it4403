@@ -1,30 +1,64 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div id="app">
+    <Menubar :model="items">
+      <template #end>
+        <h3 :style="{ 'margin-left': '0 .5em' }">zchristmas.dev</h3>
+      </template>
+    </Menubar>
+    <div class="app-container">
+      <router-view></router-view>
+    </div>
+
+    <Toast />
   </div>
-  <router-view/>
 </template>
 
-<style>
+<script>
+export default {
+  data() {
+    return {
+      items: [
+        {
+          label: "Home",
+          icon: "pi pi-fw pi-home",
+          to: "/"
+        },
+        {
+          label: "Labs",
+          icon: "pi pi-fw pi-pencil",
+          items: [
+            {
+              label: "Lab 1 (Home Page)",
+              icon: "pi pi-fw pi-star",
+              to: "/"
+            }
+          ]
+        }
+      ]
+    };
+  },
+  components: {}
+};
+</script>
+
+<style scoped>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+  margin: 0px;
+}
+.app-container {
   text-align: center;
-  color: #2c3e50;
 }
-
-#nav {
-  padding: 30px;
+body {
+  margin: 0px !important;
 }
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+body #app .p-button {
+  margin-left: 0.2em;
 }
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+form {
+  margin-top: 2em;
 }
 </style>
