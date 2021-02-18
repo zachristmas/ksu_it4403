@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Zachary Christmas - KSU IT 4403 - Milestone 1</title>
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Open+Sans);
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .topnav a.active {
+            background-color: #8c8e88;
+            color: white;
+        }
+
+        .heading {
+            padding:15px; 
+            margin-left:auto; 
+            margin-right:auto; 
+            text-align:center;
+        }
+
+        #app {
+            padding: 15px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .container {
+            border: 2px solid #ccc;
+            background-color: #eee;
+            border-radius: 5px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+
+        .container::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        .container img {
+            float: left;
+            margin-right: 20px;
+            border-radius: 5%;
+        }
+
+        .container span {
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                text-align: center;
+            }
+
+            .container img {
+                margin: auto;
+                float: none;
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topnav">
+        <a href="../index.html">HOME</a>
+        <a class="active" href="#">MILESTONE 1a</a>
+        <a href="./milestone1b.html">MILESTONE 1b</a>
+        <a href="./milestone2.html">MILESTONE 2</a>
+        <a href="./milestone3.html">MILESTONE 3</a>
+        <a href="./milestone4.html">MILESTONE 4</a>
+    </div>
+
+    <div class="heading">
+        <h2>Milestone 1a</h2>
+        <p>(List of Books)</p>
+        <hr>
+    </div>
+    <div id="app"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            //init book template
+            const Book = ({ ...book }) => `
+                <div class="container">
+                    <a href="${book.volumeInfo.infoLink}">
+                        <img src="${book.volumeInfo.imageLinks.smallThumbnail}" alt="${book.volumeInfo.title}" style="width:90px">
+                    </a>
+                    <a href="${book.volumeInfo.infoLink}">
+                        <h3>Title: <strong>${book.volumeInfo.title}</strong></h3>
+                    </a>
+                    <h4>Authors: <strong>${book.volumeInfo.authors.join(', ')}</strong></h4>
+                    <p>${book.volumeInfo.subtitle ? 'Subtitle: ' + book.volumeInfo.subtitle : ''}</p>
+                    <p>Description: ${book.volumeInfo.description.length <= 150 ? 
+                        book.volumeInfo.description : book.volumeInfo.description.substr(0,150) + '...'}</p>
+                    <hr>
+                    <h4>Details</h4>
+                    <ul style=width: 50%;>
+                        <li>Publisher: ${book.volumeInfo.publisher}</li>
+                        <li>Publish Date: ${book.volumeInfo.publishedDate}</li>
+                        <li>Page Count: ${book.volumeInfo.pageCount}</li>
+                        <li>Print Type: ${book.volumeInfo.printType}</li>
+                        <li>Categories: ${book.volumeInfo.categories.join(', ')}</li>
+                        <li>Sale Info: ${book.saleInfo.saleability}</li>
+                    </ul>
+                </div>
+                `;
+
+            //callout to api to get books
+            $.get('https://www.googleapis.com/books/v1/volumes?q=modern%20web', function (data, status) {
+                //init array
+                let booksToMap = [];
+                //check for existing data
+                if (data && data.items) {
+                    booksToMap = data.items;
+                }
+
+                //display dynamic values in app container
+                $('#app').html(data.items.map(Book).join(''));
+            });
+        });
+    </script>
+</body>
+
+</html>
