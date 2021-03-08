@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <style>
+         body {
+            font-family: Arial;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+            position: sticky;
+        }
+
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .topnav a.active {
+            background-color: #8c8e88;
+            color: white;
+        }
+
+        #menu {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 25%;
+            background-color: #f1f1f1;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+        }
+
+        li a {
+            display: block;
+            color: #000;
+            padding: 8px 16px;
+            text-decoration: none;
+        }
+
+        li a.active {
+            background-color: #4c74af;
+            color: white;
+        }
+
+        li a:hover:not(.active) {
+            background-color: #555;
+            color: white;
+        }
+
+        form.search input[type=text] {
+            padding: 10px;
+            font-size: 17px;
+            border: 1px solid grey;
+            float: left;
+            width: 80%;
+            background: #f1f1f1;
+        }
+
+        form.search button {
+            float: left;
+            width: 20%;
+            padding: 10px;
+            background: #2196F3;
+            color: white;
+            font-size: 17px;
+            border: 1px solid grey;
+            border-left: none;
+            cursor: pointer;
+        }
+
+        form.search button:hover {
+            background: #0b7dda;
+        }
+
+        form.search::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        .paging-container {
+            padding: 20px;
+        }
+
+        .content { 
+            margin: 50px; 
+            padding: 15px; 
+            width: 700px; 
+            height: 200px; 
+            border: 2px solid black; 
+        } 
+
+        .container {
+            border: 2px solid #ccc;
+            background-color: #eee;
+            border-radius: 5px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+
+        .container::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        .container img {
+            float: left;
+            margin-right: 20px;
+            border-radius: 5%;
+        }
+
+        .container span {
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                text-align: center;
+            }
+
+            .container img {
+                margin: auto;
+                float: none;
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topnav">
+        <a href="../index.html">HOME</a>
+        <a class="../milestone1/milestone1a.html" href="#">MILESTONE 1a</a>
+        <a href="../milestone1/milestone1b.html">MILESTONE 1b</a>
+        <a class="active" href="../milestone2/milestone2a.html">MILESTONE 2</a>
+    </div>
+
+    <ul id="menu">
+        <li><a class="active" href="#">Home</a></li>
+        <li><a href="./milestone2c.html">My Bookshelf</a></li>
+    </ul>
+
+    <div style="margin-left:25%;padding:1px 16px;height:auto;">
+        <h2>Search for a book:</h2>
+        <form id="searchForm" class="search" style="max-width:300px" action="Javascript:void(0)">
+            <input id="searchInput" type="text" placeholder="Search.." name="search2">
+            <button type="submit"><i class="fa fa-search"></i></button>
+        </form>
+
+        <div class="paging-container"> 
+            Page: 
+            <select id="pageSelect">
+                <option value='1'><strong>1</strong></option>
+            </select>
+        </div> 
+        <div id="bookContainer"></div>
+    </div>
+    <script>
+        const apiKey = 'AIzaSyBU-j5ZTve56O3u3I0SnP-6FQCUfgkOHnc';
+        const Book = ({ ...book }) => `
+                <div class="container">
+                    <a href="./milestone2b.html?bookId=${book.id}">
+                        <img src="${book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.smallThumbnail}" alt="${book.volumeInfo.title}" style="width:90px">
+                    </a>
+                    <a href="./milestone2b.html?bookId=${book.id}">
+                        <h3>Title: <strong>${book.volumeInfo.title}</strong></h3>
+                    </a>
+                    <h4>Authors: <strong>${book.volumeInfo.authors && book.volumeInfo.authors.join(', ')}</strong></h4>
+                    <p>${book.volumeInfo.subtitle ? 'Subtitle: ' + book.volumeInfo.subtitle : ''}</p>
+                    <p>Description: ${book.volumeInfo.description ? book.volumeInfo.description.length <= 150 ?
+                        book.volumeInfo.description : book.volumeInfo.description.substr(0, 150) + '...' : ''}</p>
+                </div>
+                `;
+        $("#searchForm").submit(function (event) {
+            if ($("#searchInput").val().trim() === "") {
+                alert('Please enter a search term.')
+                return;
+            }
+
+            const searchTerm = $("#searchInput").val();
+            window.currentTerm = searchTerm;
+            window.currentPage = '1';
+            $.get(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(searchTerm)}&key=${apiKey}&maxResults=20&startIndex=1`, function (data, status) {
+                //init array
+                let booksToMap = [];
+                let pages = [];
+                //check for existing data
+                if (data && data.items) {
+                    booksToMap = data.items;
+                    pages = Math.ceil(((data.totalItems - 1) / 20) + 1);
+                }
+                //display dynamic values in app container
+                $('#bookContainer').html(data.items.map(Book).join(''));
+                $('#pageSelect').empty();
+                for (let i = 0; i < pages; i++) {
+                    $('#pageSelect').append(`<option value="${i + 1}"><strong>${i + 1}</strong></option>`);
+                }
+            });
+            event.preventDefault();
+        });
+
+        $("#pageSelect").change(function(e) {
+            if (e.target.value == window.currentPage) {
+                return;
+            }
+            else {
+                window.currentPage = e.target.value;
+            }
+            $('#bookContainer').empty();
+            const searchTerm = window.currentTerm;
+            let index = 1;
+            if (window.currentPage != 1) {
+                index = (20 * e.target.value) + 1;
+            }
+            $.get(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(searchTerm)}&key=${apiKey}&maxResults=20&startIndex=${index}`, function (data, status) {
+                //init array
+                let booksToMap = [];
+                let pages = [];
+                //check for existing data
+                if (data && data.items) {
+                    booksToMap = data.items;
+                    pages = Math.ceil(((data.totalItems - 1) / 20) + 1);
+                }
+                //display dynamic values in app container
+                $('#bookContainer').html(data.items.map(Book).join(''));
+                $('#pageSelect').val(e.target.value).attr('selected', 'selected');
+            });
+        })
+
+    </script>
+</body>
+
+</html>

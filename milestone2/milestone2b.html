@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <style>
+         body {
+            font-family: Arial;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .topnav a.active {
+            background-color: #8c8e88;
+            color: white;
+        }
+        #menu {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 25%;
+            background-color: #f1f1f1;
+            position: fixed;
+            height: 100%;
+            overflow: auto;
+        }
+
+        li a {
+            display: block;
+            color: #000;
+            padding: 8px 16px;
+            text-decoration: none;
+        }
+
+        li a.active {
+            background-color: #4c74af;
+            color: white;
+        }
+
+        li a:hover:not(.active) {
+            background-color: #555;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="topnav">
+        <a href="../index.html">HOME</a>
+        <a class="../milestone1/milestone1a.html" href="#">MILESTONE 1a</a>
+        <a href="../milestone1/milestone1b.html">MILESTONE 1b</a>
+        <a class="active" href="../milestone2/milestone2a.html">MILESTONE 2</a>
+    </div>
+
+    <ul id="menu">
+        <li><a href="./milestone2a.html">Home</a></li>
+        <li><a href="./milestone2c.html">My Bookshelf</a></li>
+    </ul>
+
+    <div style="margin-left:25%;padding:1px 16px;height:auto;">
+        <div id="app"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        let searchParams = new URLSearchParams(window.location.search)
+        let hasBookId = searchParams.has('bookId') // true
+        let bookId = searchParams.get('bookId')
+
+        if (hasBookId) {
+            const Book = ({ ...book }) => `
+            <div class="container">
+                <img src="${book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.smallThumbnail}" alt="${book.volumeInfo.title}" style="width:90px">
+                <h3><strong>${book.volumeInfo.title}</strong>: ${book.volumeInfo.subtitle ? book.volumeInfo.subtitle : ''}</h3>
+                <p><strong>${book.volumeInfo.authors && book.volumeInfo.authors.join(', ')}</strong></p>
+                <p>${book.volumeInfo.publisher}, ${book.volumeInfo.publishedDate} - ${book.volumeInfo.pageCount} pages</p>
+                
+                <p>${book.volumeInfo.description}</p>
+                <hr>
+                <h4>Details</h4>
+                <ul style=width: 50%;>
+                    <li>Publisher: ${book.volumeInfo.publisher}</li>
+                        <li>Publish Date: ${book.volumeInfo.publishedDate}</li>
+                        <li>Page Count: ${book.volumeInfo.pageCount}</li>
+                        <li>Print Type: ${book.volumeInfo.printType}</li>
+                        <li>Categories: ${book.volumeInfo.categories && book.volumeInfo.categories.join(', ')}</li>
+                        <li>Sale Info: ${book.saleInfo.saleability}</li>
+                </ul>
+            </div>
+            `;
+
+        //callout to api to get books
+        $.get('https://www.googleapis.com/books/v1/volumes/' + bookId, function (data, status) {
+                //init array
+                let booksToMap = [];
+                //check for existing data
+                if (data && data.volumeInfo) {
+                    booksToMap.push(data)
+                }
+                //display dynamic values in app container
+                $('#app').html(booksToMap.map(Book).join(''));
+            });
+        }
+        else {
+            $('#app').html('<h1>Please enter a book Id in the URL</h1>');
+        }
+    });
+    </script>
+    </div>
+
+</body>
+
+</html>
